@@ -7,13 +7,14 @@ ACharacter* a;
 
 #include "CustomGravityPluginPrivatePCH.h"
 
+
 // Sets default values
 AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
 {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCapsule0"));
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCylinder"));
 	if (CapsuleComponent)
 	{
 		CapsuleComponent->InitCapsuleSize(42.0f, 96.0f);
@@ -49,26 +50,11 @@ AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) :Super(O
 		Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
 	}*/
 
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PawnMesh0"));
-	if (Mesh)
-	{
-		Mesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPose;
-		Mesh->bCastDynamicShadow = true;
-		Mesh->bAffectDynamicIndirectLighting = true;
-		Mesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-		Mesh->SetGenerateOverlapEvents(false);
-		Mesh->SetNotifyRigidBodyCollision(false);
-		Mesh->SetupAttachment(CapsuleComponent);
-	}
-
 	GravityMovementComponent = CreateDefaultSubobject<UGravityMovementComponent>(TEXT("MovementComponent0"));
 	if (GravityMovementComponent)
 	{
 		GravityMovementComponent->SetUpdatedComponent(CapsuleComponent);
-		if (GravityMovementComponent)
-		{
-			GravityMovementComponent->SetComponentOwner(this);
-		}
+		GravityMovementComponent->SetComponentOwner(this);
 	}
 
 	GizmoRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("GizmoRootComponent0"));

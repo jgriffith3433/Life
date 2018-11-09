@@ -74,11 +74,21 @@ ALifeCharacter::ALifeCharacter(const FObjectInitializer& ObjectInitializer)
 		CrouchedEyeHeight = GravityMovementComponent->CrouchedHalfHeight * 0.80f;
 	}
 
+	Mesh = CreateOptionalDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh0"));
 	if (Mesh)
 	{
 		Mesh->AlwaysLoadOnClient = true;
 		Mesh->AlwaysLoadOnServer = true;
 		Mesh->bOwnerNoSee = false;
+		Mesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPose;
+		Mesh->bCastDynamicShadow = true;
+		Mesh->bAffectDynamicIndirectLighting = true;
+		Mesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+		Mesh->SetupAttachment(CapsuleComponent);
+		static FName MeshCollisionProfileName(TEXT("CharacterMesh"));
+		Mesh->SetCollisionProfileName(MeshCollisionProfileName);
+		Mesh->SetGenerateOverlapEvents(false);
+		Mesh->SetCanEverAffectNavigation(false);
 	}
 
 	BaseRotationOffset = FQuat::Identity;
