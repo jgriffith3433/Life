@@ -112,7 +112,7 @@ void  APlanetActor::SetGravityPower(float NewGravity)
 
 
 
-void APlanetActor::SetForceMode(EForceMode newForceMode)
+void APlanetActor::SetForceMode(EForceMode::Type newForceMode)
 {
 	ForceMode = newForceMode;
 }

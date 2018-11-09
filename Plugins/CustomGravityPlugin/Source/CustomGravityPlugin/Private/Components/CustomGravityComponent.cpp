@@ -1,8 +1,3 @@
-// Copyright 2015 Elhoussine Mehnik (Mhousse1247). All Rights Reserved.
-//******************* http://ue4resources.com/ *********************//
-
-
-
 #include "CustomGravityPluginPrivatePCH.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -75,14 +70,14 @@ void UCustomGravityComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		CurrentGravityInfo = CustomGravityInfo;
 	}
 
-	else if (GravityType == EGravityType::EGT_GlobalCustom)
+	else if (GravityType == EGravityType::EGT_GlobalGravity)
 	{
 		CurrentGravityInfo = UCustomGravityManager::GetGlobalCustomGravityInfo();
 	}
 
 	else if (GravityType == EGravityType::EGT_Point)
 	{
-		if (PlanetActor == NULL){ return; }
+		if (PlanetActor == NULL) { return; }
 
 		CurrentGravityInfo = PlanetActor->GetGravityinfo(UpdatedComponent->GetComponentLocation());
 	}
@@ -112,7 +107,7 @@ void UCustomGravityComponent::SetGravityScale(float NewGravityScale)
 	GravityScale = NewGravityScale;
 }
 
-void UCustomGravityComponent::SetGravityType(EGravityType NewGravityType)
+void UCustomGravityComponent::SetGravityType(EGravityType::Type NewGravityType)
 {
 	GravityType = NewGravityType;
 }

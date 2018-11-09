@@ -1,20 +1,15 @@
-// Copyright 2015 Elhoussine Mehnik (Mhousse1247). All Rights Reserved.
-//******************* http://ue4resources.com/ *********************//
-
-
 
 ACharacter* a;
 
 #include "CustomGravityPluginPrivatePCH.h"
 
-
 // Sets default values
-AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
+AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCylinder"));
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CollisionCapsule0"));
 	if (CapsuleComponent)
 	{
 		CapsuleComponent->InitCapsuleSize(42.0f, 96.0f);
@@ -43,23 +38,36 @@ AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) :Super(O
 		SpringArm->SetupAttachment(CapsuleComponent);
 	}
 
-	/*Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera0"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera0"));
 	if (Camera)
 	{
 		Camera->FieldOfView = 90.0f;
 		Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
-	}*/
+	}
 
-	GravityMovementComponent = CreateDefaultSubobject<UGravityMovementComponent>(TEXT("MovementComponent0"));
-	if (GravityMovementComponent)
+	PawnMesh = CreateOptionalDefaultSubobject<USkeletalMeshComponent>(TEXT("PawnMesh0"));
+	if (PawnMesh)
 	{
-		GravityMovementComponent->SetUpdatedComponent(CapsuleComponent);
-		GravityMovementComponent->SetComponentOwner(this);
+		PawnMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPose;
+		PawnMesh->bCastDynamicShadow = true;
+		PawnMesh->bAffectDynamicIndirectLighting = true;
+		PawnMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+		PawnMesh->SetCollisionProfileName(TEXT("CharacterMesh"));
+		PawnMesh->SetGenerateOverlapEvents(false);
+		PawnMesh->SetNotifyRigidBodyCollision(false);
+		PawnMesh->SetupAttachment(CapsuleComponent);
+	}
+
+	MovementComponent = CreateDefaultSubobject<UGravityMovementComponent>(TEXT("MovementComponent0"));
+	if (MovementComponent)
+	{
+		MovementComponent->SetUpdatedComponent(CapsuleComponent);
+		MovementComponent->SetComponentOwner(this);
 	}
 
 	GizmoRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("GizmoRootComponent0"));
 
-	
+
 
 	if (GizmoRootComponent)
 	{
@@ -104,8 +112,8 @@ AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) :Super(O
 
 	// Initialization
 
-	/*CameraPitchMin = -89.0f;
-	CameraPitchMax = 89.0f;*/
+	CameraPitchMin = -89.0f;
+	CameraPitchMax = 89.0f;
 }
 
 void AGravityPawn::PostInitializeComponents()
@@ -114,12 +122,13 @@ void AGravityPawn::PostInitializeComponents()
 
 	if (!IsPendingKill())
 	{
-		if (Mesh)
+		if (PawnMesh)
 		{
+
 			// force animation tick after movement component updates
-			if (Mesh->PrimaryComponentTick.bCanEverTick && GravityMovementComponent)
+			if (PawnMesh->PrimaryComponentTick.bCanEverTick && MovementComponent)
 			{
-				Mesh->PrimaryComponentTick.AddPrerequisite(GravityMovementComponent, GravityMovementComponent->PrimaryComponentTick);
+				PawnMesh->PrimaryComponentTick.AddPrerequisite(MovementComponent, MovementComponent->PrimaryComponentTick);
 			}
 		}
 	}
@@ -138,10 +147,33 @@ void AGravityPawn::Tick(float DeltaTime)
 	GizmoRootComponent->SetWorldRotation(FRotationMatrix::MakeFromXZ(CurrentForwardDirection, GetActorUpVector()).Rotator());
 
 }
-/*
-void AGravityPawn::AddForwardMovementInput(float ScaleValue, bool bForce)
+
+
+void AGravityPawn::Jump()
 {
-	if (MovementComponent == NULL){ return; }
+	if (MovementComponent == NULL) { return; }
+
+	MovementComponent->DoJump();
+}
+
+
+void AGravityPawn::Sprint()
+{
+	if (MovementComponent == NULL) { return; }
+
+	MovementComponent->DoSprint();
+}
+
+void AGravityPawn::StopSprint()
+{
+	if (MovementComponent == NULL) { return; }
+
+	MovementComponent->DoStopSprint();
+}
+
+void AGravityPawn::AddForwardMovementInput(float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)
+{
+	if (MovementComponent == NULL) { return; }
 
 	const FVector UpDirection = GetActorUpVector();
 	const FVector CameraForward = Camera->GetForwardVector();
@@ -154,12 +186,14 @@ void AGravityPawn::AddForwardMovementInput(float ScaleValue, bool bForce)
 
 	const float ControlValue = MovementComponent->IsMovingOnGround() ? ScaleValue : ScaleValue * MovementComponent->AirControlRatio;
 	AddMovementInput(CurrentForwardDirection.GetSafeNormal(), ControlValue, bForce);
+
+
 }
-*/
-/*
-void AGravityPawn::AddRightMovementInput(float ScaleValue, bool bForce)
+
+
+void AGravityPawn::AddRightMovementInput(float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)
 {
-	if (MovementComponent == NULL){ return; }
+	if (MovementComponent == NULL) { return; }
 
 	const FVector UpDirection = GetActorUpVector();
 	const FVector CameraRight = Camera->GetRightVector();
@@ -174,9 +208,9 @@ void AGravityPawn::AddRightMovementInput(float ScaleValue, bool bForce)
 
 	AddMovementInput(CurrentRightDirection.GetSafeNormal(), ControlValue, bForce);
 }
-*/
-/*
-void AGravityPawn::AddCameraPitchInput(float UpdateRate, float ScaleValue)
+
+
+void AGravityPawn::AddCameraPitchInput(float UpdateRate /*= 1.0f*/, float ScaleValue /*= 0.0f*/)
 {
 	if (SpringArm != NULL)
 	{
@@ -186,16 +220,32 @@ void AGravityPawn::AddCameraPitchInput(float UpdateRate, float ScaleValue)
 		SpringArm->SetRelativeRotation(CameraRelativeRot);
 	}
 }
-*/
-/*
-void AGravityPawn::AddCameraYawInput(float UpdateRate, float ScaleValue)
+
+
+void AGravityPawn::AddCameraYawInput(float UpdateRate /*= 1.0f*/, float ScaleValue /*= 0.0f*/)
 {
 	if (SpringArm != NULL)
 	{
 		SpringArm->AddRelativeRotation(FRotator(0.0f, ScaleValue * UpdateRate, 0.0f));
 	}
 }
-*/
+
+
+void AGravityPawn::EnableDebugging()
+{
+	if (CapsuleComponent != NULL) { CapsuleComponent->SetHiddenInGame(false); }
+	if (GizmoRootComponent != NULL) { GizmoRootComponent->SetHiddenInGame(false, true); }
+	if (MovementComponent != NULL) { MovementComponent->EnableDebuging(); }
+}
+
+
+void AGravityPawn::DisableDebugging()
+{
+	if (CapsuleComponent != NULL) { CapsuleComponent->SetHiddenInGame(true); }
+	if (GizmoRootComponent != NULL) { GizmoRootComponent->SetHiddenInGame(true, true); }
+	if (MovementComponent != NULL) { MovementComponent->DisableDebuging(); }
+}
+
 
 FVector AGravityPawn::GetCurrentForwardDirection() const
 {
@@ -211,13 +261,12 @@ void AGravityPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-
-	if (GravityMovementComponent == NULL)
+	if (MovementComponent == NULL)
 	{
 		return;
 	}
 
-	GravityMovementComponent->CapsuleHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	MovementComponent->CapsuleHited(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }
 
 void AGravityPawn::UpdateMeshRotation(float DeltaTime)

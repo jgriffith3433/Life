@@ -1,9 +1,3 @@
-// Copyright 2015 Elhoussine Mehnik (Mhousse1247). All Rights Reserved.
-//******************* http://ue4resources.com/ *********************//
-
-
-
-
 #include "CustomGravityPluginPrivatePCH.h"
 
 //Initialization
@@ -25,7 +19,7 @@ void UCustomGravityManager::SetGlobalCustomGravityDirection(const FVector& NewGr
 	GlobalCustomGravityInfo.GravityDirection = NewGravityDirection;
 }
 
-void UCustomGravityManager::SetGlobalCustomGravityForceMode(EForceMode NewForceMode)
+void UCustomGravityManager::SetGlobalCustomGravityForceMode(EForceMode::Type NewForceMode)
 {
 	GlobalCustomGravityInfo.ForceMode = NewForceMode;
 }
@@ -46,7 +40,7 @@ FVector UCustomGravityManager::GetGlobalCustomGravityDirection()
 
 }
 
-TEnumAsByte<EForceMode> UCustomGravityManager::GetGlobalCustomGravityForceMode()
+TEnumAsByte<EForceMode::Type> UCustomGravityManager::GetGlobalCustomGravityForceMode()
 {
 	return GlobalCustomGravityInfo.ForceMode;
 }
@@ -58,21 +52,21 @@ FGravityInfo UCustomGravityManager::GetGlobalCustomGravityInfo()
 
 FString UCustomGravityManager::Conv_GravityInfoToString(FGravityInfo GravityInfo)
 {
-	
+
 	const FString GravityPowerStr = FString::SanitizeFloat(GravityInfo.GravityPower);
 	const FString DirectionStr = GravityInfo.GravityDirection.GetSafeNormal().ToString();
 	const FString GravityTypeStr = UCustomGravityManager::Conv_ForceModeToString(GravityInfo.ForceMode);
 	const FString SubSteppingStr = GravityInfo.bForceSubStepping ? "ForceSubStepping : Enabled" : "ForceSubStepping : Disabled";
 
-		return TEXT("<  ") + 
-			GravityPowerStr + TEXT("  ,  ") + 
-			DirectionStr + TEXT("  ,  ") + 
-			GravityTypeStr + TEXT("  ,  ") + 
-			SubSteppingStr + 
-			TEXT("  >");
+	return TEXT("<  ") +
+		GravityPowerStr + TEXT("  ,  ") +
+		DirectionStr + TEXT("  ,  ") +
+		GravityTypeStr + TEXT("  ,  ") +
+		SubSteppingStr +
+		TEXT("  >");
 }
 
-FString UCustomGravityManager::Conv_GravityTypeToString(EGravityType InGravityType)
+FString UCustomGravityManager::Conv_GravityTypeToString(EGravityType::Type InGravityType)
 {
 	switch (InGravityType)
 	{
@@ -82,14 +76,14 @@ FString UCustomGravityManager::Conv_GravityTypeToString(EGravityType InGravityTy
 		return TEXT("Point(Planet)");
 	case EGravityType::EGT_Custom:
 		return TEXT("Custom");
-	case EGravityType::EGT_GlobalCustom:
-		return TEXT("Global Custom");
+	case EGravityType::EGT_GlobalGravity:
+		return TEXT("Global Gravity");
 	}
 
 	return TEXT("ERROR !");
 }
 
-FString UCustomGravityManager::Conv_ForceModeToString(EForceMode InForceMode)
+FString UCustomGravityManager::Conv_ForceModeToString(EForceMode::Type InForceMode)
 {
 	return  InForceMode == EForceMode::EFM_Acceleration ? "Acceleration" : "Force";
 }

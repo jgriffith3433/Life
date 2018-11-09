@@ -1,22 +1,14 @@
-// Copyright 2015 Elhoussine Mehnik (Mhousse1247). All Rights Reserved.
-//******************* http://ue4resources.com/ *********************//
-
-
-
-
 #pragma once
 #include "CustomGravityManager.h"
 #include "CustomGravityComponent.generated.h"
 
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Gravity), meta = (BlueprintSpawnableComponent))
 class CUSTOMGRAVITYPLUGIN_API UCustomGravityComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-
-
 	/**
 	* Default UObject constructor.
 	*/
@@ -33,7 +25,7 @@ public:
 
 	/**Change GravityType*/
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
-		void SetGravityType(EGravityType NewGravityType);	
+		void SetGravityType(EGravityType::Type NewGravityType);
 
 	/**Update Current Planet Reference*/
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
@@ -45,15 +37,15 @@ public:
 
 	/**Update the Component updated by this component*/
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
-	void SetUpdatedComponent(UPrimitiveComponent* NewUpdatedComponent);
+		void SetUpdatedComponent(UPrimitiveComponent* NewUpdatedComponent);
 
 	/** Return PrimitiveComponent we are Updating. */
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
-	UPrimitiveComponent* GetUpdatedComponent() const;
+		UPrimitiveComponent* GetUpdatedComponent() const;
 
 	/** Return APlanetActor reference. */
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
-	class APlanetActor* GetCurrentPlanet() const;
+		class APlanetActor* GetCurrentPlanet() const;
 
 	/** Return current component gravity direction. */
 	UFUNCTION(BlueprintCallable, Category = "Physics|Components|CustomGravity")
@@ -69,11 +61,11 @@ public:
 
 protected:
 
-	/** Custom gravity scale. Gravity is multiplied by this amount for the component owner. */
+	/** Custom Gravity scale. Gravity is multiplied by this amount for the component owner. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Custom Gravity Component (General Settings)")
 		float GravityScale;
 
-	/** Custom gravity Information.
+	/** Custom Gravity Information.
 	* Gravity Power.
 	* Gravity Direction.
 	* Force Mode.
@@ -89,13 +81,13 @@ protected:
 	* Global Custom Gravity.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Custom Gravity Component (General Settings)")
-		TEnumAsByte<EGravityType> GravityType;
+		TEnumAsByte<EGravityType::Type> GravityType;
 
 	/**Planet Actor Reference .*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Custom Gravity Component (General Settings)")
-	class APlanetActor* PlanetActor;
+		class APlanetActor* PlanetActor;
 
-	
+
 	/**The Updated Collision Component*/
 	UPrimitiveComponent* UpdatedComponent;
 

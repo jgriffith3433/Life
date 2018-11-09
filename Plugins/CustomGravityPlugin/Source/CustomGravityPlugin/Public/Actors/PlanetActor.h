@@ -68,7 +68,7 @@ public:
 
 	/** Planet force mode : Acceleration or Force. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Planet Actor : General Settings")
-		 TEnumAsByte<EForceMode> ForceMode;
+		 TEnumAsByte<EForceMode::Type> ForceMode;
 
 	/** Planet gravity power. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Planet Actor : General Settings")
@@ -84,7 +84,7 @@ public:
 
 	/** Update planet force mode*/
 	UFUNCTION(BlueprintCallable, Category = "PlanetActor")
-		void SetForceMode(EForceMode newForceMode);
+		void SetForceMode(EForceMode::Type newForceMode);
 
 	/**Returns a specific gravity direction based on the target location*/
 	UFUNCTION(BlueprintCallable, Category = "PlanetActor")

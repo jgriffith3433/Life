@@ -1,21 +1,11 @@
 
-#include "AI/Navigation/AvoidanceManager.h"
 #include "CustomGravityPluginPrivatePCH.h"
 
-
-DEFINE_LOG_CATEGORY_STATIC(LogCharacterMovement, Log, All);
-
-UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGravityMovementComponent::UGravityMovementComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	// Initialization
 
-	// InitializeComponent virtual void can be called
-	bWantsInitializeComponent = true;
-
-	bAutoActivate = true;
+	//Gravity Movement Component
 
 	GravityScale = 2.0f;
 	bCanJump = true;
@@ -50,9 +40,10 @@ UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& O
 	bDebugIsEnabled = false;
 
 	// Floating Pawn Movement
-	/*MaxSpeed = 500.0;
+
+	MaxSpeed = 500.0;
 	Acceleration = 2048.0f;
-	Deceleration = 2048.0f;*/
+	Deceleration = 2048.0f;
 }
 
 // Initializes the component
@@ -73,108 +64,9 @@ void UGravityMovementComponent::InitializeComponent()
 	TimeInAir = 0.0f;
 	bIsInAir = true;
 	bCanResetGravity = false;
+	LastWalkSpeed = MaxSpeed;
 }
 
-void UGravityMovementComponent::SetUpdatedComponent(USceneComponent* NewUpdatedComponent)
-{
-	if (NewUpdatedComponent)
-	{
-		const AGravityPawn* NewCharacterOwner = Cast<AGravityPawn>(NewUpdatedComponent->GetOwner());
-		if (NewCharacterOwner == NULL)
-		{
-			UE_LOG(LogCharacterMovement, Error, TEXT("%s owned by %s must update a component owned by a GravityPawn"), *GetName(), *GetNameSafe(NewUpdatedComponent->GetOwner()));
-			return;
-		}
-
-		// check that UpdatedComponent is a Capsule
-		if (Cast<UCapsuleComponent>(NewUpdatedComponent) == NULL)
-		{
-			UE_LOG(LogCharacterMovement, Error, TEXT("%s owned by %s must update a capsule component"), *GetName(), *GetNameSafe(NewUpdatedComponent->GetOwner()));
-			return;
-		}
-	}
-
-	if (bMovementInProgress)
-	{
-		// failsafe to avoid crashes in CharacterMovement. 
-		bDeferUpdateMoveComponent = true;
-		DeferredUpdatedMoveComponent = NewUpdatedComponent;
-		return;
-	}
-	bDeferUpdateMoveComponent = false;
-	DeferredUpdatedMoveComponent = NULL;
-
-	USceneComponent* OldUpdatedComponent = UpdatedComponent;
-	UPrimitiveComponent* OldPrimitive = Cast<UPrimitiveComponent>(UpdatedComponent);
-	if (IsValid(OldPrimitive) && OldPrimitive->OnComponentBeginOverlap.IsBound())
-	{
-		OldPrimitive->OnComponentBeginOverlap.RemoveDynamic(this, &UGravityMovementComponent::CapsuleTouched);
-	}
-
-
-	PawnOwner = NewUpdatedComponent ? CastChecked<AGravityPawn>(NewUpdatedComponent->GetOwner()) : NULL;
-
-	if (UpdatedComponent && UpdatedComponent != NewUpdatedComponent)
-	{
-		UpdatedComponent->SetShouldUpdatePhysicsVolume(false);
-		if (!UpdatedComponent->IsPendingKill())
-		{
-			UpdatedComponent->SetPhysicsVolume(NULL, true);
-			UpdatedComponent->PhysicsVolumeChangedDelegate.RemoveDynamic(this, &UMovementComponent::PhysicsVolumeChanged);
-		}
-
-		// remove from tick prerequisite
-		UpdatedComponent->PrimaryComponentTick.RemovePrerequisite(this, PrimaryComponentTick);
-	}
-
-	// Don't assign pending kill components, but allow those to null out previous UpdatedComponent.
-	UpdatedComponent = IsValid(NewUpdatedComponent) ? NewUpdatedComponent : NULL;
-	UpdatedPrimitive = Cast<UPrimitiveComponent>(UpdatedComponent);
-
-	// Assign delegates
-	if (UpdatedComponent && !UpdatedComponent->IsPendingKill())
-	{
-		UpdatedComponent->SetShouldUpdatePhysicsVolume(true);
-		UpdatedComponent->PhysicsVolumeChangedDelegate.AddUniqueDynamic(this, &UMovementComponent::PhysicsVolumeChanged);
-
-		// force ticks after movement component updates
-		UpdatedComponent->PrimaryComponentTick.AddPrerequisite(this, PrimaryComponentTick);
-	}
-
-	UpdateTickRegistration();
-
-	if (bSnapToPlaneAtStart)
-	{
-		SnapUpdatedComponentToPlane();
-	}
-	CharacterOwner = Cast<ACharacter>(PawnOwner);
-
-	if (UpdatedComponent != OldUpdatedComponent)
-	{
-		ClearAccumulatedForces();
-	}
-
-	if (UpdatedComponent == NULL)
-	{
-		StopActiveMovement();
-	}
-
-	const bool bValidUpdatedPrimitive = IsValid(UpdatedPrimitive);
-
-	if (bValidUpdatedPrimitive && bEnablePhysicsInteraction)
-	{
-		UpdatedPrimitive->OnComponentBeginOverlap.AddUniqueDynamic(this, &UGravityMovementComponent::CapsuleTouched);
-	}
-
-	if (bUseRVOAvoidance && IsValid(NewUpdatedComponent))
-	{
-		UAvoidanceManager* AvoidanceManager = GetWorld()->GetAvoidanceManager();
-		if (AvoidanceManager)
-		{
-			AvoidanceManager->RegisterMovementComponent(this, AvoidanceWeight);
-		}
-	}
-}
 
 // Called every frame
 void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -352,7 +244,7 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 			}
 
 
-			case EGravityType::EGT_GlobalCustom:
+			case EGravityType::EGT_GlobalGravity:
 			{
 				CurrentGravityInfo = UCustomGravityManager::GetGlobalCustomGravityInfo();
 				CurrentOrientationInfo = OrientationSettings.GlobalCustomGravity;
@@ -397,126 +289,6 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	ApplyGravity(GravityForce, bShouldUseStepping, bUseAccelerationChange);
 }
 
-bool UGravityMovementComponent::IsMovingOnGround() const
-{
-	return !bIsInAir;
-}
-
-bool UGravityMovementComponent::IsFalling() const
-{
-	return bIsInAir;
-}
-
-FVector UGravityMovementComponent::GetFallingVelocity() const
-{
-	return CapsuleComponent->GetComponentVelocity().ProjectOnTo(-CurrentGravityInfo.GravityDirection);
-}
-
-FVector UGravityMovementComponent::GetMovementVelocity() const
-{
-	const FVector UpVector = CapsuleComponent ? CapsuleComponent->GetUpVector() : FVector::UpVector;
-	return FVector::VectorPlaneProject(Velocity, UpVector);
-
-}
-
-float UGravityMovementComponent::GetFallingSpeed() const
-{
-	const float Direction = FVector::DotProduct(-CurrentGravityInfo.GravityDirection, GetFallingVelocity());
-
-	return GetFallingVelocity().Size() * FMath::Sign(Direction);
-}
-
-float UGravityMovementComponent::GetCurrentWalkSpeed() const
-{
-	return GetMovementVelocity().Size();
-}
-
-float UGravityMovementComponent::GetInAirTime() const
-{
-	return TimeInAir;
-}
-
-float UGravityMovementComponent::GetGravityPower() const
-{
-	return  CurrentGravityInfo.GravityPower* GravityScale;
-}
-
-void UGravityMovementComponent::StopMovementImmediately()
-{
-	Super::StopMovementImmediately();
-
-	const FVector ZeroVelocity = FVector(0.f, 0.f, 0.f);
-	Velocity = ZeroVelocity;
-
-	if (CapsuleComponent != NULL)
-	{
-		CapsuleComponent->SetPhysicsLinearVelocity(ZeroVelocity);
-	}
-}
-
-void UGravityMovementComponent::SetComponentOwner(class AGravityPawn* Owner)
-{
-	PawnOwner = Owner;
-}
-
-void UGravityMovementComponent::CapsuleHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
-{
-	CapsuleHitResult = Hit;
-
-	const float FallingSpeed = FMath::Abs(GetFallingSpeed());
-
-	if (FallingSpeed > 100.0f)
-	{
-		FVector CurrentVelocity = CapsuleComponent->GetComponentVelocity();
-		CurrentVelocity = CapsuleComponent->GetComponentTransform().InverseTransformVector(CurrentVelocity);
-		CurrentVelocity.Z = 0.0f;
-		CurrentVelocity = CapsuleComponent->GetComponentTransform().TransformVector(CurrentVelocity);
-		CapsuleComponent->SetPhysicsLinearVelocity(CurrentVelocity);
-	}
-
-	const float OnGroundHitDot = FVector::DotProduct(HitNormal, CapsuleComponent->GetUpVector());
-
-	if (OnGroundHitDot > 0.75f)
-	{
-		bIsJumping = false;
-	}
-
-	if (!bEnablePhysicsInteraction)
-	{
-		return;
-	}
-
-	if (OtherComp != NULL && OtherComp->IsAnySimulatingPhysics())
-	{
-		const FVector OtherLoc = OtherComp->GetComponentLocation();
-		const FVector Loc = CapsuleComponent->GetComponentLocation();
-		FVector ImpulseDir = (OtherLoc - Loc).GetSafeNormal();
-		ImpulseDir = FVector::VectorPlaneProject(ImpulseDir, -CurrentGravityInfo.GravityDirection);
-		ImpulseDir = (ImpulseDir + GetMovementVelocity().GetSafeNormal()) * 0.5f;
-		ImpulseDir.Normalize();
-
-
-		float TouchForceFactorModified = HitForceFactor;
-
-		if (bHitForceScaledToMass)
-		{
-			FBodyInstance* BI = OtherComp->GetBodyInstance();
-			TouchForceFactorModified *= BI ? BI->GetBodyMass() : 1.0f;
-		}
-
-		float ImpulseStrength = GetMovementVelocity().Size() * TouchForceFactorModified;
-
-		FVector Impulse = ImpulseDir * ImpulseStrength;
-		float dot = FVector::DotProduct(HitNormal, CapsuleComponent->GetUpVector());
-
-		if (dot > 0.99f && !bAllowDownwardForce)
-		{
-			return;
-		}
-
-		OtherComp->AddImpulseAtLocation(Impulse, HitLocation);
-	}
-}
 
 
 void UGravityMovementComponent::UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, bool bInstantRot, float RotationSpeed)
@@ -562,24 +334,173 @@ void UGravityMovementComponent::ApplyGravity(const FVector& Force, bool bAllowSu
 	CapsuleComponent->GetBodyInstance()->AddForce(Force, bAllowSubstepping, bAccelChange);
 }
 
-bool UGravityMovementComponent::DoJump(bool bReplayingMoves)
-{
-	if (CharacterOwner && CharacterOwner->CanJump())
-	{
-		const float TargetJumpHeight = JumpHeight + CapsuleComponent->GetScaledCapsuleHalfHeight();
-		const FVector JumpImpulse = CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower());
-		const bool bUseAccl = (CurrentGravityInfo.ForceMode == EForceMode::EFM_Acceleration);
 
-		CapsuleComponent->GetBodyInstance()->AddImpulse(JumpImpulse, bUseAccl);
-		return true;
+void UGravityMovementComponent::DoJump()
+{
+	if (bIsInAir) { return; }
+
+	const float TargetJumpHeight = JumpHeight + CapsuleComponent->GetScaledCapsuleHalfHeight();
+	const FVector JumpImpulse = CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower());
+	const bool bUseAccl = (CurrentGravityInfo.ForceMode == EForceMode::EFM_Acceleration);
+
+	CapsuleComponent->GetBodyInstance()->AddImpulse(JumpImpulse, bUseAccl);
+}
+
+void UGravityMovementComponent::DoSprint()
+{
+	if (bIsInAir || bIsSprinting) { return; }
+
+	LastWalkSpeed = MaxSpeed;
+	MaxSpeed *= SpeedBoostMultiplier;
+	bIsSprinting = true;
+}
+
+void UGravityMovementComponent::DoStopSprint()
+{
+	MaxSpeed = LastWalkSpeed;
+	bIsSprinting = false;
+}
+
+void UGravityMovementComponent::StopMovementImmediately()
+{
+	Super::StopMovementImmediately();
+
+	const FVector ZeroVelocity = FVector(0.f, 0.f, 0.f);
+	Velocity = ZeroVelocity;
+
+	if (CapsuleComponent != NULL)
+	{
+		CapsuleComponent->SetPhysicsLinearVelocity(ZeroVelocity);
 	}
-	return false;
+}
+
+void UGravityMovementComponent::CapsuleHited(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	CapsuleHitResult = Hit;
+
+	const float FallingSpeed = FMath::Abs(GetFallingSpeed());
+
+	if (FallingSpeed > 100.0f)
+	{
+		FVector CurrentVelocity = CapsuleComponent->GetComponentVelocity();
+		CurrentVelocity = CapsuleComponent->GetComponentTransform().InverseTransformVector(CurrentVelocity);
+		CurrentVelocity.Z = 0.0f;
+		CurrentVelocity = CapsuleComponent->GetComponentTransform().TransformVector(CurrentVelocity);
+		CapsuleComponent->SetPhysicsLinearVelocity(CurrentVelocity);
+	}
+
+	const float OnGroundHitDot = FVector::DotProduct(HitNormal, CapsuleComponent->GetUpVector());
+
+	if (OnGroundHitDot > 0.75f)
+	{
+		bIsJumping = false;
+	}
+
+
+	if (!bEnablePhysicsInteraction)
+	{
+		return;
+	}
+
+	if (OtherComp != NULL && OtherComp->IsAnySimulatingPhysics())
+	{
+		const FVector OtherLoc = OtherComp->GetComponentLocation();
+		const FVector Loc = CapsuleComponent->GetComponentLocation();
+		FVector ImpulseDir = (OtherLoc - Loc).GetSafeNormal();
+		ImpulseDir = FVector::VectorPlaneProject(ImpulseDir, -CurrentGravityInfo.GravityDirection);
+		ImpulseDir = (ImpulseDir + GetMovementVelocity().GetSafeNormal()) * 0.5f;
+		ImpulseDir.Normalize();
+
+
+		float TouchForceFactorModified = HitForceFactor;
+
+		if (bHitForceScaledToMass)
+		{
+			FBodyInstance* BI = OtherComp->GetBodyInstance();
+			TouchForceFactorModified *= BI ? BI->GetBodyMass() : 1.0f;
+		}
+
+		float ImpulseStrength = GetMovementVelocity().Size() * TouchForceFactorModified;
+
+		FVector Impulse = ImpulseDir * ImpulseStrength;
+		float dot = FVector::DotProduct(HitNormal, CapsuleComponent->GetUpVector());
+
+		if (dot > 0.99f && !bAllowDownwardForce)
+		{
+			return;
+		}
+
+		OtherComp->AddImpulseAtLocation(Impulse, HitLocation);
+	}
+}
+
+
+
+
+bool UGravityMovementComponent::IsMovingOnGround() const
+{
+	return !bIsInAir;
+}
+
+bool UGravityMovementComponent::IsFalling() const
+{
+	return bIsInAir;
+}
+
+float UGravityMovementComponent::GetGravityPower() const
+{
+	return  CurrentGravityInfo.GravityPower* GravityScale;
+}
+
+FVector UGravityMovementComponent::GetFallingVelocity() const
+{
+	return CapsuleComponent->GetComponentVelocity().ProjectOnTo(-CurrentGravityInfo.GravityDirection);
+}
+
+FVector UGravityMovementComponent::GetMovementVelocity() const
+{
+	const FVector UpVector = CapsuleComponent ? CapsuleComponent->GetUpVector() : FVector::UpVector;
+	return FVector::VectorPlaneProject(Velocity, UpVector);
+
+}
+
+float UGravityMovementComponent::GetFallingSpeed() const
+{
+	const float Direction = FVector::DotProduct(-CurrentGravityInfo.GravityDirection, GetFallingVelocity());
+
+	return GetFallingVelocity().Size() * FMath::Sign(Direction);
+}
+
+float UGravityMovementComponent::GetCurrentWalkSpeed() const
+{
+	return GetMovementVelocity().Size();
+}
+
+float UGravityMovementComponent::GetInAirTime() const
+{
+	return TimeInAir;
+}
+
+void UGravityMovementComponent::EnableDebuging()
+{
+	bDebugIsEnabled = true;
+}
+
+void UGravityMovementComponent::DisableDebuging()
+{
+	bDebugIsEnabled = false;
 }
 
 
 void UGravityMovementComponent::RequestGravityImmediateUpdate()
 {
 	bRequestImmediateUpdate = true;
+}
+
+void UGravityMovementComponent::SetComponentOwner(class AGravityPawn* Owner)
+{
+	PawnOwner = Owner;
 }
 
 void UGravityMovementComponent::SetCurrentPlanet(APlanetActor* NewPlanetActor)
@@ -592,12 +513,19 @@ void UGravityMovementComponent::ClearPlanet()
 	PlanetActor = nullptr;
 }
 
+
 APlanetActor* UGravityMovementComponent::GetCurrentPlanet() const
 {
 	return PlanetActor;
+}
+
+bool UGravityMovementComponent::IsSprinting() const
+{
+	return bIsSprinting;
 }
 
 FVector UGravityMovementComponent::GetGravityDirection() const
 {
 	return CurrentGravityInfo.GravityDirection;
 }
+
