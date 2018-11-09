@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class LifeTarget : TargetRules
 {
-	public LifeTarget(TargetInfo Target) : base(Target)
+    public LifeTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+        Type = TargetType.Game;
 
-		ExtraModuleNames.AddRange( new string[] { "Life" } );
-	}
+        ExtraModuleNames.AddRange(new string[] { "Life" });
+    }
 }

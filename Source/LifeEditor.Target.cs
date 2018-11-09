@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 public class LifeEditorTarget : TargetRules
 {
-	public LifeEditorTarget(TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "Life" } );
-	}
+    public LifeEditorTarget(TargetInfo Target) : base(Target)
+	{
+        Type = TargetType.Editor;
+
+        ExtraModuleNames.AddRange(new string[] { "Life" });
+    }
 }

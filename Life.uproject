@@ -7,7 +7,16 @@
 		{
 			"Name": "Life",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CustomGravityPlugin"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "CustomGravityPlugin",
+			"Enabled": true
 		}
 	]
 }
