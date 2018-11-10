@@ -65,20 +65,15 @@ struct FOrientationInfo
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orientation Settings")
-		bool bIsInstant;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Orientation Settings")
-		float RotationInterpSpeed;
+		float BaseRotationInterpSpeed;
 
 	FOrientationInfo()
 	{
-		bIsInstant = false;
-		RotationInterpSpeed = 5.0f;
+		BaseRotationInterpSpeed = 1.0f;
 	}
-	FOrientationInfo(bool _isInstant, float _interpSpeed)
+	FOrientationInfo(float _interpSpeed)
 	{
-		bIsInstant = _isInstant;
-		RotationInterpSpeed = _interpSpeed;
+		BaseRotationInterpSpeed = _interpSpeed;
 	}
 };
 

@@ -34,7 +34,7 @@ public:
 	UFUNCTION()
 		virtual void CapsuleHited(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit);
 
-	virtual void UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, bool bInstantRot, float RotationSpeed);
+	virtual void UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, float RotationSpeed);
 	virtual void ApplyGravity(const FVector& Force, bool bAllowSubstepping, bool bAccelChange);
 	virtual void DoJump();
 	virtual void DoSprint();
@@ -178,6 +178,15 @@ public:
 	UPROPERTY(Category = "Gravity Movement Component", VisibleInstanceOnly, BlueprintReadOnly)
 		FHitResult CapsuleHitResult;
 
+	UPROPERTY(Category = "Gravity Movement Component", VisibleInstanceOnly, BlueprintReadOnly)
+		class AActor* StandingOnActor;
+
+	UPROPERTY(Category = "Gravity Movement Component", VisibleInstanceOnly, BlueprintReadOnly)
+		bool bIsStandingOnPlanet;
+
+	UPROPERTY(Category = "Gravity Movement Component", VisibleInstanceOnly, BlueprintReadOnly)
+		bool bIsInAir;
+
 	/* Change Immediately Gravity Info */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|Components|GravityMovementComponent")
 		void RequestGravityImmediateUpdate();
@@ -264,9 +273,9 @@ private:
 
 	FOrientationInfo CurrentOrientationInfo;
 
-	bool bDebugIsEnabled;
+	float CurrentPlanetDistance;
 
-	bool bIsInAir;
+	bool bDebugIsEnabled;
 
 	FRotator CurrentCapsuleRotation;
 

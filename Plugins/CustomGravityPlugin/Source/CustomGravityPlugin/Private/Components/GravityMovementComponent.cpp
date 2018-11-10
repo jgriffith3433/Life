@@ -230,7 +230,7 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 				CurrentGravityInfo = FGravityInfo(-CapsuleComponent->GetWorld()->GetGravityZ(), -FVector::UpVector, EForceMode::EFM_Acceleration, true);
 				CurrentOrientationInfo = OrientationSettings.DefaultGravity;
 
-				UpdateCapsuleRotation(DeltaTime, -CurrentGravityInfo.GravityDirection, CurrentOrientationInfo.bIsInstant, CurrentOrientationInfo.RotationInterpSpeed);
+				UpdateCapsuleRotation(DeltaTime, -CurrentGravityInfo.GravityDirection, CurrentOrientationInfo.BaseRotationInterpSpeed);
 
 				return;
 			}
@@ -255,6 +255,7 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 			case EGravityType::EGT_Point:
 			{
 				if (PlanetActor == NULL) { return; }
+				CurrentPlanetDistance = FVector::Distance(CapsuleComponent->GetOwner()->GetActorLocation(), PlanetActor->GetActorLocation());
 				CurrentGravityInfo = PlanetActor->GetGravityinfo(CapsuleComponent->GetComponentLocation());
 				CurrentOrientationInfo = OrientationSettings.PointGravity;
 				break;
@@ -275,15 +276,27 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 
 	const FVector GravityForce = CurrentGravityDirection.GetSafeNormal() * CurrentGravityPower;
 
-	const float InterpSpeed = CurrentOrientationInfo.RotationInterpSpeed;
-	const bool bOrientationIsInstant = CurrentOrientationInfo.bIsInstant;
 
+	float InterpSpeed = CurrentOrientationInfo.BaseRotationInterpSpeed;
+	if (bIsInAir)
+	{
+		bIsStandingOnPlanet = false;
+		StandingOnActor = NULL;
+		if (CurrentPlanetDistance != 0)
+		{
+			InterpSpeed = InterpSpeed / (CurrentPlanetDistance / 50);
+		}
+	}
+	if (InterpSpeed < CurrentOrientationInfo.BaseRotationInterpSpeed)
+	{
+		InterpSpeed = CurrentOrientationInfo.BaseRotationInterpSpeed;
+	}
 
 	/************************************/
 	/****************************************/
 
 	/* Update Rotation : Orient Capsule's up vector to have the same direction as -gravityDirection */
-	UpdateCapsuleRotation(DeltaTime, -CurrentGravityDirection, bOrientationIsInstant, InterpSpeed);
+	UpdateCapsuleRotation(DeltaTime, -CurrentGravityDirection, InterpSpeed);
 
 	/* Apply Gravity*/
 	ApplyGravity(GravityForce, bShouldUseStepping, bUseAccelerationChange);
@@ -291,38 +304,32 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 
 
 
-void UGravityMovementComponent::UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, bool bInstantRot, float RotationSpeed)
+void UGravityMovementComponent::UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, float RotationSpeed)
 {
 	const FVector CapsuleUp = CapsuleComponent->GetUpVector();
 	const FQuat DeltaQuat = FQuat::FindBetween(CapsuleUp, TargetUpVector);
 	const FQuat TargetQuat = DeltaQuat * CapsuleComponent->GetComponentRotation().Quaternion();
 
-	if (bInstantRot)
+
+	switch (OrientationSettings.InterpolationMode)
+	{
+	case EOrientationInterpolationMode::OIM_RInterpTo:
+	{
+		CapsuleComponent->SetWorldRotation(
+			FMath::RInterpTo(CurrentCapsuleRotation, TargetQuat.Rotator(), DeltaTime, RotationSpeed));
+		break;
+	}
+	case EOrientationInterpolationMode::OIM_Slerp:
+	{
+		CapsuleComponent->SetWorldRotation(
+			FQuat::Slerp(CurrentCapsuleRotation.Quaternion(), TargetQuat, DeltaTime* RotationSpeed));
+		break;
+	}
+	default:
 	{
 		CapsuleComponent->SetWorldRotation(TargetQuat);
+		break;
 	}
-	else
-	{
-		switch (OrientationSettings.InterpolationMode)
-		{
-		case EOrientationInterpolationMode::OIM_RInterpTo:
-		{
-			CapsuleComponent->SetWorldRotation(
-				FMath::RInterpTo(CurrentCapsuleRotation, TargetQuat.Rotator(), DeltaTime, RotationSpeed));
-			break;
-		}
-		case EOrientationInterpolationMode::OIM_Slerp:
-		{
-			CapsuleComponent->SetWorldRotation(
-				FQuat::Slerp(CurrentCapsuleRotation.Quaternion(), TargetQuat, DeltaTime* RotationSpeed));
-			break;
-		}
-		default:
-		{
-			CapsuleComponent->SetWorldRotation(TargetQuat);
-			break;
-		}
-		}
 	}
 
 	CurrentCapsuleRotation = CapsuleComponent->GetComponentRotation();
@@ -395,8 +402,16 @@ void UGravityMovementComponent::CapsuleHited(class UPrimitiveComponent* MyComp, 
 	if (OnGroundHitDot > 0.75f)
 	{
 		bIsJumping = false;
+		StandingOnActor = Other;
+		if (StandingOnActor && StandingOnActor->IsA(APlanetActor::StaticClass()))
+		{
+			bIsStandingOnPlanet = true;
+		}
+		else
+		{
+			bIsStandingOnPlanet = false;
+		}
 	}
-
 
 	if (!bEnablePhysicsInteraction)
 	{

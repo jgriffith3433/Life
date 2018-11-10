@@ -83,6 +83,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn")
 		FVector GetCurrentRightDirection() const;
 
+	/** Movement component used for movement. */
+	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UGravityMovementComponent* MovementComponent;
 
 private:
 
@@ -97,10 +100,6 @@ private:
 	/** the main camera associated with this Pawn . */
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* Camera;
-
-	/** Movement component used for movement. */
-	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UGravityMovementComponent* MovementComponent;
 
 	/** Skeletal mesh associated with this Pawn. */
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
