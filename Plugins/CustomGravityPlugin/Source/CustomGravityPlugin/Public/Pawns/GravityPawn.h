@@ -35,7 +35,7 @@ public:
 
 	/** Handle jump action. */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
-		void Jump();
+		virtual void Jump();
 
 	/** Handle sprint action. */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
@@ -47,11 +47,11 @@ public:
 
 	/** Called to move Gravity pawn Forward and Backward */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
-		void AddForwardMovementInput(float ScaleValue = 1.0f, bool bForce = false);
+		virtual void AddForwardMovementInput(float ScaleValue = 1.0f, bool bForce = false);
 
 	/** Called to move Gravity pawn Left and Right */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
-		void AddRightMovementInput(float ScaleValue = 1.0f, bool bForce = false);
+		virtual void AddRightMovementInput(float ScaleValue = 1.0f, bool bForce = false);
 
 	/**
 	* Add input (affecting Pitch) to the SpringArm relative rotation.
@@ -87,7 +87,7 @@ public:
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UGravityMovementComponent* MovementComponent;
 
-private:
+protected:
 
 	/** The CapsuleComponent being used for movement collision (by CharacterMovement).*/
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

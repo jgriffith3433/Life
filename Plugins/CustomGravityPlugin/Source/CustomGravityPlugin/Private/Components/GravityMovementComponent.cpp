@@ -10,6 +10,7 @@ UGravityMovementComponent::UGravityMovementComponent()
 	GravityScale = 2.0f;
 	bCanJump = true;
 	JumpHeight = 300.0f;
+	JumpDistance = 300.0f;
 	GroundHitToleranceDistance = 20.0f;
 	SpeedBoostMultiplier = 2.0f;
 	AirControlRatio = 0.5f;
@@ -342,12 +343,12 @@ void UGravityMovementComponent::ApplyGravity(const FVector& Force, bool bAllowSu
 }
 
 
-void UGravityMovementComponent::DoJump()
+void UGravityMovementComponent::DoJump(FVector ForwardsDir)
 {
 	if (bIsInAir) { return; }
 
 	const float TargetJumpHeight = JumpHeight + CapsuleComponent->GetScaledCapsuleHalfHeight();
-	const FVector JumpImpulse = CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower());
+	const FVector JumpImpulse = (CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower())) + (ForwardsDir * JumpDistance);
 	const bool bUseAccl = (CurrentGravityInfo.ForceMode == EForceMode::EFM_Acceleration);
 
 	CapsuleComponent->GetBodyInstance()->AddImpulse(JumpImpulse, bUseAccl);

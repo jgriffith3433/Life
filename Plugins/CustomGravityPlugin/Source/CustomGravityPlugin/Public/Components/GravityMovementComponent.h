@@ -36,7 +36,7 @@ public:
 
 	virtual void UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, float RotationSpeed);
 	virtual void ApplyGravity(const FVector& Force, bool bAllowSubstepping, bool bAccelChange);
-	virtual void DoJump();
+	virtual void DoJump(FVector ForwardsDir);
 	virtual void DoSprint();
 	virtual void DoStopSprint();
 	virtual void EnableDebuging();
@@ -60,6 +60,9 @@ public:
 	/** Desired jump height */
 	UPROPERTY(Category = "Gravity Movement Component : General Settings", EditAnywhere, BlueprintReadWrite)
 		float JumpHeight = 300.f;
+
+	UPROPERTY(Category = "Gravity Movement Component : General Settings", EditAnywhere, BlueprintReadWrite)
+		float JumpDistance = 300.f;
 
 	/** Maximum acceptable distance for Gravity pawn capsule/sphere to walk above a surface. */
 	UPROPERTY(Category = "Gravity Movement Component : General Settings", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))

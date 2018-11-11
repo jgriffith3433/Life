@@ -153,7 +153,7 @@ void AGravityPawn::Jump()
 {
 	if (MovementComponent == NULL) { return; }
 
-	MovementComponent->DoJump();
+	MovementComponent->DoJump(FVector::ZeroVector);
 }
 
 
