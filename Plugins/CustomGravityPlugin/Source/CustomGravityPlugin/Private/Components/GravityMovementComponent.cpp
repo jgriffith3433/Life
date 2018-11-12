@@ -348,7 +348,7 @@ void UGravityMovementComponent::DoJump(FVector ForwardsDir)
 	if (bIsInAir) { return; }
 
 	const float TargetJumpHeight = JumpHeight + CapsuleComponent->GetScaledCapsuleHalfHeight();
-	const FVector JumpImpulse = (CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower())) + (ForwardsDir * JumpDistance);
+	const FVector JumpImpulse = (CapsuleComponent->GetUpVector() * FMath::Sqrt(TargetJumpHeight * 2.f * GetGravityPower()));// +(ForwardsDir * JumpDistance);
 	const bool bUseAccl = (CurrentGravityInfo.ForceMode == EForceMode::EFM_Acceleration);
 
 	CapsuleComponent->GetBodyInstance()->AddImpulse(JumpImpulse, bUseAccl);

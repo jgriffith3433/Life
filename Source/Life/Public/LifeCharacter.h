@@ -25,6 +25,8 @@ public:
 
 	void TeleportCharacter(class ALifeTeleporter* LifeTeleporter);
 	void StopAllAnimMontages();
+	
+	bool bStartingJump;
 
 protected:
 	FTimerHandle SlowStepHandle;
@@ -35,7 +37,6 @@ protected:
 	float ForwardLastMovementInputValue;
 	float RightLastMovementInputValue;
 	bool bCanStep;
-	bool bStartingJump;
 	float SteppingSpeed;
 
 	FVector CurrentJumpDirection;

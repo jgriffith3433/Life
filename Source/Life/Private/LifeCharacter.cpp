@@ -130,7 +130,7 @@ void ALifeCharacter::Jump()
 	{
 		bStartingJump = true;
 		bJumping = true;
-		CurrentJumpDirection = CurrentForwardDirection.GetSafeNormal();
+		CurrentJumpDirection = GetMesh()->GetForwardVector();
 		GetWorld()->GetTimerManager().SetTimer(JumpReadyHandle, this, &ALifeCharacter::OnJumpReady, TimeBeforeJump, false);
 	}
 }

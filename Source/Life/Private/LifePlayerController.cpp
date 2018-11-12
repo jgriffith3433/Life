@@ -53,7 +53,7 @@ void ALifePlayerController::SetPawn(APawn* InPawn)
 
 void ALifePlayerController::OnInputMoveForward(float AxisValue)
 {
-	if (LifeCharacter && bCanMove)
+	if (LifeCharacter && bCanMove && !LifeCharacter->bStartingJump)
 	{
 		LifeCharacter->AddForwardMovement(AxisValue);
 	}
@@ -61,7 +61,7 @@ void ALifePlayerController::OnInputMoveForward(float AxisValue)
 
 void ALifePlayerController::OnInputMoveRight(float AxisValue)
 {
-	if (LifeCharacter && bCanMove)
+	if (LifeCharacter && bCanMove && !LifeCharacter->bStartingJump)
 	{
 		LifeCharacter->AddRightMovement(AxisValue);
 	}
