@@ -18,10 +18,13 @@ public:
 	ALifeCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Tick(float DeltaTime) override;
-	virtual void AddForwardMovementInput(float ScaleValue = 1.0f, bool bForce = false) override;
-	virtual void AddRightMovementInput(float ScaleValue = 1.0f, bool bForce = false) override;
+	virtual void AddForwardMovement(float ScaleValue) override;
+	virtual void AddRightMovement(float ScaleValue) override;
+	virtual void StopMovement();
 	virtual void Jump() override;
 
+	void TeleportCharacter(class ALifeTeleporter* LifeTeleporter);
+	void StopAllAnimMontages();
 
 protected:
 	FTimerHandle SlowStepHandle;
@@ -63,4 +66,6 @@ protected:
 		void OnJumpReady();
 	UFUNCTION()
 		void OnJumpFinish();
+
+
 };

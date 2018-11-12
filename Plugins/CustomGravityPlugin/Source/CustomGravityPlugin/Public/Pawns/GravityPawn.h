@@ -19,8 +19,8 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	virtual void BeginPlay() override;
 	// End of AActor interface
-
 
 	virtual void UpdateMeshRotation(float DeltaTime);
 
@@ -47,11 +47,11 @@ public:
 
 	/** Called to move Gravity pawn Forward and Backward */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
-		virtual void AddForwardMovementInput(float ScaleValue = 1.0f, bool bForce = false);
+		virtual void AddForwardMovement(float ScaleValue = 1.0f);
 
 	/** Called to move Gravity pawn Left and Right */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
-		virtual void AddRightMovementInput(float ScaleValue = 1.0f, bool bForce = false);
+		virtual void AddRightMovement(float ScaleValue = 1.0f);
 
 	/**
 	* Add input (affecting Pitch) to the SpringArm relative rotation.
@@ -87,6 +87,10 @@ public:
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UGravityMovementComponent* MovementComponent;
 
+	/** the main camera associated with this Pawn . */
+	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* Camera;
+
 protected:
 
 	/** The CapsuleComponent being used for movement collision (by CharacterMovement).*/
@@ -96,10 +100,6 @@ protected:
 	/** The camera boom. */
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		USpringArmComponent* SpringArm;
-
-	/** the main camera associated with this Pawn . */
-	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UCameraComponent* Camera;
 
 	/** Skeletal mesh associated with this Pawn. */
 	UPROPERTY(Category = "Gravity Pawn", VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

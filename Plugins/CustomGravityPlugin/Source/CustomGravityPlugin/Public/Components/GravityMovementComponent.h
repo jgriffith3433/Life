@@ -262,6 +262,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pawn|Components|GravityMovementComponent")
 		float GetInAirTime() const;
 
+	FGravityInfo CurrentGravityInfo;
+
 protected:
 
 	/**The Updated component*/
@@ -271,8 +273,6 @@ protected:
 	class AGravityPawn* PawnOwner;
 
 private:
-
-	FGravityInfo CurrentGravityInfo;
 
 	FOrientationInfo CurrentOrientationInfo;
 

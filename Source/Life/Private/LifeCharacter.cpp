@@ -2,6 +2,8 @@
 
 
 #include "Life.h"
+#include "LifeTeleporter.h"
+#include "LifePlayerController.h"
 #include "LifeCharacter.h"
 
 
@@ -36,9 +38,11 @@ void ALifeCharacter::Tick(float DeltaTime)
 	}
 }
 
-void ALifeCharacter::AddForwardMovementInput(float ScaleValue, bool bForce)
+void ALifeCharacter::AddForwardMovement(float ScaleValue)
 {
-	if (MovementComponent == NULL) { return; }
+	if (MovementComponent == NULL || !GetWorld()) { return; }
+
+	if (!GetWorld()) { return; }
 
 	const FVector UpDirection = GetActorUpVector();
 	const FVector CameraForward = Camera->GetForwardVector();
@@ -68,9 +72,9 @@ void ALifeCharacter::AddForwardMovementInput(float ScaleValue, bool bForce)
 	}
 }
 
-void ALifeCharacter::AddRightMovementInput(float ScaleValue, bool bForce)
+void ALifeCharacter::AddRightMovement(float ScaleValue)
 {
-	if (MovementComponent == NULL) { return; }
+	if (MovementComponent == NULL || !GetWorld()) { return; }
 
 	const FVector UpDirection = GetActorUpVector();
 	const FVector CameraRight = Camera->GetRightVector();
@@ -98,6 +102,12 @@ void ALifeCharacter::AddRightMovementInput(float ScaleValue, bool bForce)
 		GetWorld()->GetTimerManager().ClearTimer(SlowStepHandle);
 		GetWorld()->GetTimerManager().ClearTimer(FastStepHandle);
 	}
+}
+
+void ALifeCharacter::StopMovement()
+{
+	ForwardLastMovementInputValue = 0.0f;
+	RightLastMovementInputValue = 0.0f;
 }
 
 void ALifeCharacter::OnStep()
@@ -141,4 +151,21 @@ void ALifeCharacter::OnJumpFinish()
 {
 	bJumping = false;
 	GetWorld()->GetTimerManager().ClearTimer(JumpFinishHandle);
+}
+
+void ALifeCharacter::TeleportCharacter(ALifeTeleporter* LifeTeleporter)
+{
+	ALifePlayerController* LifePlayerController = Cast<ALifePlayerController>(Controller);
+	if (LifePlayerController)
+	{
+		LifePlayerController->TeleportCharacter(LifeTeleporter);
+	}
+}
+
+void ALifeCharacter::StopAllAnimMontages()
+{
+	if (PawnMesh && PawnMesh->AnimScriptInstance)
+	{
+		PawnMesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
 }

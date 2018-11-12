@@ -42,6 +42,7 @@ AGravityPawn::AGravityPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	if (Camera)
 	{
 		Camera->FieldOfView = 90.0f;
+		Camera->bAutoActivate = true;
 		Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
 	}
 
@@ -149,6 +150,12 @@ void AGravityPawn::Tick(float DeltaTime)
 }
 
 
+void AGravityPawn::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+
 void AGravityPawn::Jump()
 {
 	if (MovementComponent == NULL) { return; }
@@ -171,7 +178,7 @@ void AGravityPawn::StopSprint()
 	MovementComponent->DoStopSprint();
 }
 
-void AGravityPawn::AddForwardMovementInput(float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)
+void AGravityPawn::AddForwardMovement(float ScaleValue)
 {
 	if (MovementComponent == NULL) { return; }
 
@@ -185,13 +192,11 @@ void AGravityPawn::AddForwardMovementInput(float ScaleValue /*= 1.0f*/, bool bFo
 	}
 
 	const float ControlValue = MovementComponent->IsMovingOnGround() ? ScaleValue : ScaleValue * MovementComponent->AirControlRatio;
-	AddMovementInput(CurrentForwardDirection.GetSafeNormal(), ControlValue, bForce);
-
-
+	AddMovementInput(CurrentForwardDirection.GetSafeNormal(), ControlValue, false);
 }
 
 
-void AGravityPawn::AddRightMovementInput(float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)
+void AGravityPawn::AddRightMovement(float ScaleValue)
 {
 	if (MovementComponent == NULL) { return; }
 
@@ -206,7 +211,7 @@ void AGravityPawn::AddRightMovementInput(float ScaleValue /*= 1.0f*/, bool bForc
 
 	const float ControlValue = MovementComponent->IsMovingOnGround() ? ScaleValue : ScaleValue * MovementComponent->AirControlRatio;
 
-	AddMovementInput(CurrentRightDirection.GetSafeNormal(), ControlValue, bForce);
+	AddMovementInput(CurrentRightDirection.GetSafeNormal(), ControlValue, false);
 }
 
 
