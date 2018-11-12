@@ -35,11 +35,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = Teleporter)
 		ACameraActor* TeleporterCamera;
 
-protected:
-
 	/** FX component */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 		UParticleSystemComponent* TeleportPSC;
+
+protected:
+
 
 	/** FX of active pickup */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)

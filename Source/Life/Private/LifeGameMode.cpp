@@ -17,7 +17,6 @@ ALifeGameMode::ALifeGameMode(const FObjectInitializer& ObjectInitializer) : Supe
 
 class ALifeCharacter* ALifeGameMode::GetNewLifeCharacter(FTransform SpawnTransform, FActorSpawnParameters SpawnInfo)
 {
-
 	return GetWorld()->SpawnActor<ALifeCharacter>(DefaultPawnClass, SpawnTransform, SpawnInfo);
 }
 

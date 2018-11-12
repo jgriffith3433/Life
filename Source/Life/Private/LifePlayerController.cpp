@@ -127,6 +127,10 @@ void ALifePlayerController::FinishTeleporting()
 				ALifeGameMode* LifeGameMode = Cast<ALifeGameMode>(GameMode);
 				if (LifeGameMode)
 				{
+					if (TeleporterDestination->TeleportPSC)
+					{
+						TeleporterDestination->TeleportPSC->ActivateSystem();
+					}
 					FTransform TeleporterDestinationTransform = TeleporterDestination->TeleportDestinationComponent->GetComponentTransform();
 					
 					FActorSpawnParameters SpawnInfo;
@@ -137,5 +141,6 @@ void ALifePlayerController::FinishTeleporting()
 				}
 			}
 		}
+		TeleporterDestination = NULL;
 	}
 }

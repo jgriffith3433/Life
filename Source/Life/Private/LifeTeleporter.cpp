@@ -8,18 +8,13 @@
 
 ALifeTeleporter::ALifeTeleporter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	UCapsuleComponent* CollisionComp = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CollisionComp"));
-	CollisionComp->InitCapsuleSize(40.0f, 50.0f);
-	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	RootComponent = CollisionComp;
+	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, TEXT("RootComponent"));
 
 	TeleportDestinationComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, TEXT("TeleportDestinationComponent"));
 	if (TeleportDestinationComponent)
 	{
-		TeleportDestinationComponent->SetupAttachment(CollisionComp);
-		TeleportDestinationComponent->AddRelativeLocation(CollisionComp->GetForwardVector() * 100.0f);
+		TeleportDestinationComponent->SetupAttachment(RootComponent);
+		TeleportDestinationComponent->AddRelativeLocation(RootComponent->GetForwardVector() * 100.0f);
 	}
 
 	StaticMesh = CreateOptionalDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh0"));
@@ -29,7 +24,7 @@ ALifeTeleporter::ALifeTeleporter(const FObjectInitializer& ObjectInitializer) : 
 		StaticMesh->bAffectDynamicIndirectLighting = true;
 		StaticMesh->SetGenerateOverlapEvents(false);
 		StaticMesh->SetNotifyRigidBodyCollision(false);
-		StaticMesh->SetupAttachment(CollisionComp);
+		StaticMesh->SetupAttachment(RootComponent);
 	}
 
 	TeleportPSC = ObjectInitializer.CreateDefaultSubobject<UParticleSystemComponent>(this, TEXT("TeleportPSC"));
@@ -42,7 +37,7 @@ ALifeTeleporter::ALifeTeleporter(const FObjectInitializer& ObjectInitializer) : 
 
 	bCanTeleport = true;
 	TeleportTime = 2.0f;
-	CameraWaitTime = 2.0f;
+	CameraWaitTime = 1.0f;
 	TeleportInactiveTime = 4.0f;
 }
 
@@ -88,10 +83,6 @@ void ALifeTeleporter::ReceiveTeleport(ALifeCharacter* LifeCharacter)
 		bCanTeleport = false;
 		GetWorld()->GetTimerManager().SetTimer(CanTeleportHandle, this, &ALifeTeleporter::SetCanTeleport, TeleportInactiveTime, false);
 		LifeCharacter->TeleportCharacter(this);
-		if (TeleportPSC)
-		{
-			TeleportPSC->ActivateSystem();
-		}
 		if (TeleportSound)
 		{
 			UGameplayStatics::SpawnSoundAttached(TeleportSound, GetRootComponent());
