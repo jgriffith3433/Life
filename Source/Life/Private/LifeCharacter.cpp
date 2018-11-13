@@ -128,6 +128,10 @@ void ALifeCharacter::Jump()
 {
 	if (!bStartingJump)
 	{
+		if (JumpSound)
+		{
+			UGameplayStatics::SpawnSoundAttached(JumpSound, GetRootComponent());
+		}
 		bStartingJump = true;
 		bJumping = true;
 		CurrentJumpDirection = GetMesh()->GetForwardVector();
@@ -167,5 +171,16 @@ void ALifeCharacter::StopAllAnimMontages()
 	if (PawnMesh && PawnMesh->AnimScriptInstance)
 	{
 		PawnMesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
+}
+
+void ALifeCharacter::FinishLevel()
+{
+	ALifePlayerController* LifePlayerController = Cast<ALifePlayerController>(Controller);
+	if (LifePlayerController)
+	{
+		StopAllAnimMontages();
+		StopMovement();
+		LifePlayerController->FinishLevel();
 	}
 }

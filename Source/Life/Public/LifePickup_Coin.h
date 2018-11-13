@@ -14,8 +14,14 @@ UCLASS()
 class LIFE_API ALifePickup_Coin : public ALifePickup
 {
 	GENERATED_UCLASS_BODY()
+public:
+	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CoinIndex;
+
 protected:
 
 	/** give pickup */
-	virtual void GivePickupTo(ALifeCharacter* LifeCharacter) override;
+	virtual void GivePickup() override;
+
 };

@@ -4,6 +4,7 @@
 #include "LifeCharacter.h"
 #include "LifePlayerCameraManager.h"
 #include "LifeGameMode.h"
+#include "LifePickup_Coin.h"
 #include "LifePlayerController.h"
 
 
@@ -30,6 +31,14 @@ void ALifePlayerController::SetupInputComponent()
 	//InputComponent->BindAction("ConditionalCloseScoreboard", IE_Pressed, this, &AShooterPlayerController::OnConditionalCloseScoreboard);
 	//InputComponent->BindAction("ToggleScoreboard", IE_Pressed, this, &AShooterPlayerController::OnToggleScoreboard);
 	
+}
+
+void ALifePlayerController::Tick(float DeltaTime)
+{
+	if (!bCanMove && LifeCharacter)
+	{
+		LifeCharacter->StopMovement();
+	}
 }
 
 void ALifePlayerController::SetPawn(APawn* InPawn)
@@ -65,6 +74,23 @@ void ALifePlayerController::OnInputMoveRight(float AxisValue)
 	{
 		LifeCharacter->AddRightMovement(AxisValue);
 	}
+}
+
+void ALifePlayerController::PickupCoin(ALifePickup_Coin* Coin)
+{
+	PickedUpCoins.Add(Coin);
+	TotalPickedUpCoinsThisLevel++;
+}
+
+void ALifePlayerController::AddLevelCoin(ALifePickup_Coin* Coin)
+{
+	LevelCoins.Add(Coin);
+	TotalCoinsThisLevel++;
+}
+
+void ALifePlayerController::FinishLevel()
+{
+	OnFinishLevel();
 }
 
 void ALifePlayerController::SwitchToExternalCamera(ACameraActor* CameraActor)

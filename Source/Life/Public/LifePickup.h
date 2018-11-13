@@ -14,6 +14,17 @@ class ALifePickup : public AActor
 	virtual void NotifyActorBeginOverlap(class AActor* Other) override;
 	virtual void BeginPlay() override;
 
+	/** hide the pickup */
+	void HidePickup();
+
+	/** give pickup */
+	UFUNCTION(BlueprintCallable)
+		virtual void GivePickup();
+
+	/** deactivate the pickup */
+	UFUNCTION(BlueprintCallable)
+		void DeactivatePickup();
+
 protected:
 
 	/** FX component */
@@ -29,21 +40,15 @@ protected:
 	USoundCue* PickupSound;
 
 	/** Static mesh associated with this pickup. */
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Effects)
 		UStaticMeshComponent* StaticMesh;
 
 	/** Static mesh associated with this pickup. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
-		float TimeBeforeDestroy;
+		float TimeBeforeHide;
 		
 	bool bCanPickup;
 
-	/** give pickup */
-	virtual void GivePickupTo(class ALifeCharacter* LifeCharacter);
-
 private:
-	FTimerHandle DestroyPickupHandle;
-
-	UFUNCTION()
-		void DestroyPickup();
+	FTimerHandle HidePickupHandle;
 };

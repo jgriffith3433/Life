@@ -25,7 +25,13 @@ public:
 
 	void TeleportCharacter(class ALifeTeleporter* LifeTeleporter);
 	void StopAllAnimMontages();
-	
+	UFUNCTION(BlueprintCallable)
+		void FinishLevel();
+
+	/** sound played when player picks it up */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+		USoundCue* JumpSound;
+
 	bool bStartingJump;
 
 protected:

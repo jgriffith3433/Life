@@ -50,6 +50,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 		USoundCue* TeleportSound;
 
+	/** sound played when player teleports */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+		USoundCue* TeleportReceiveSound;
+
 	/** sound played on begin play */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 		USoundCue* TeleporterActiveSound;
@@ -71,8 +75,12 @@ protected:
 	UFUNCTION()
 		void SetCanTeleport();
 
+	UFUNCTION()
+		void PlayTeleportReceive();
+
 private:
 	bool bCanTeleport;
 	FTimerHandle CanTeleportHandle;
+	FTimerHandle TeleportReceiveHandle;
 
 };

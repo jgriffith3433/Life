@@ -3,6 +3,7 @@
 #include "Life.h"
 #include "LifePickup_Coin.h"
 #include "LifePlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "LifeGameMode.h"
 
 
@@ -11,14 +12,21 @@ ALifePickup_Coin::ALifePickup_Coin(const FObjectInitializer& ObjectInitializer) 
 {
 }
 
-void ALifePickup_Coin::GivePickupTo(ALifeCharacter* LifeCharacter)
+void ALifePickup_Coin::BeginPlay()
 {
-	if (LifeCharacter)
+	Super::BeginPlay();
+	ALifePlayerController* LifePlayerController = Cast<ALifePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (LifePlayerController)
 	{
-		ALifePlayerController* LifePC = Cast<ALifePlayerController>(LifeCharacter->Controller);
-		if (LifePC)
-		{
-			LifePC->PickedUpCoins.Add(this);
-		}
+		LifePlayerController->AddLevelCoin(this);
+	}
+}
+
+void ALifePickup_Coin::GivePickup()
+{
+	ALifePlayerController* LifePlayerController = Cast<ALifePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (LifePlayerController)
+	{
+		LifePlayerController->PickupCoin(this);
 	}
 }

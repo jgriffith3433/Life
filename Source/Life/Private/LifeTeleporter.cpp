@@ -82,11 +82,20 @@ void ALifeTeleporter::ReceiveTeleport(ALifeCharacter* LifeCharacter)
 	{
 		bCanTeleport = false;
 		GetWorld()->GetTimerManager().SetTimer(CanTeleportHandle, this, &ALifeTeleporter::SetCanTeleport, TeleportInactiveTime, false);
+		GetWorld()->GetTimerManager().SetTimer(TeleportReceiveHandle, this, &ALifeTeleporter::PlayTeleportReceive, CameraWaitTime + TeleportTime, false);
 		LifeCharacter->TeleportCharacter(this);
-		if (TeleportSound)
-		{
-			UGameplayStatics::SpawnSoundAttached(TeleportSound, GetRootComponent());
-		}
+	}
+}
+
+void ALifeTeleporter::PlayTeleportReceive()
+{
+	if (TeleportReceiveSound)
+	{
+		UGameplayStatics::SpawnSoundAttached(TeleportReceiveSound, GetRootComponent());
+	}
+	if (TeleportPSC)
+	{
+		TeleportPSC->ActivateSystem();
 	}
 }
 

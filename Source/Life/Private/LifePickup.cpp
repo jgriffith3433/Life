@@ -8,7 +8,7 @@
 ALifePickup::ALifePickup(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	UCapsuleComponent* CollisionComp = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CollisionComp"));
-	CollisionComp->InitCapsuleSize(40.0f, 50.0f);
+	CollisionComp->InitCapsuleSize(60.0f, 75.0f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
@@ -34,7 +34,7 @@ ALifePickup::ALifePickup(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	ActivePSC->SetupAttachment(RootComponent);
 
 	bCanPickup = true;
-	TimeBeforeDestroy = 1.0f;
+	TimeBeforeHide = 1.0f;
 }
 
 void ALifePickup::BeginPlay()
@@ -42,9 +42,22 @@ void ALifePickup::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALifePickup::GivePickupTo(class ALifeCharacter* LifeCharacter)
+void ALifePickup::GivePickup()
 {
 
+}
+
+void ALifePickup::HidePickup()
+{
+	GetWorld()->GetTimerManager().ClearTimer(HidePickupHandle);
+	DeactivatePickup();
+}
+
+void ALifePickup::DeactivatePickup()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
 }
 
 void ALifePickup::NotifyActorBeginOverlap(class AActor* Other)
@@ -53,7 +66,7 @@ void ALifePickup::NotifyActorBeginOverlap(class AActor* Other)
 	ALifeCharacter* LifeCharacter = Cast<ALifeCharacter>(Other);
 	if (LifeCharacter && !IsPendingKill() && bCanPickup)
 	{
-		GivePickupTo(LifeCharacter);
+		GivePickup();
 		if (PickupPSC)
 		{
 			PickupPSC->ActivateSystem();
@@ -68,12 +81,6 @@ void ALifePickup::NotifyActorBeginOverlap(class AActor* Other)
 		}
 		bCanPickup = false;
 		StaticMesh->SetVisibility(false);
-		GetWorld()->GetTimerManager().SetTimer(DestroyPickupHandle, this, &ALifePickup::DestroyPickup, TimeBeforeDestroy, false);
+		GetWorld()->GetTimerManager().SetTimer(HidePickupHandle, this, &ALifePickup::HidePickup, TimeBeforeHide, false);
 	}
-}
-
-void ALifePickup::DestroyPickup()
-{
-	GetWorld()->GetTimerManager().ClearTimer(DestroyPickupHandle);
-	Destroy();
 }
