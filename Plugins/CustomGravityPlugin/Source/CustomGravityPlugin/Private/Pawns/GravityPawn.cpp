@@ -235,6 +235,11 @@ void AGravityPawn::AddCameraYawInput(float UpdateRate /*= 1.0f*/, float ScaleVal
 	}
 }
 
+void AGravityPawn::AddExternalForce(FVector ExternalForce)
+{
+	if (MovementComponent != NULL) { MovementComponent->AddExternalForce(ExternalForce); }
+}
+
 
 void AGravityPawn::EnableDebugging()
 {

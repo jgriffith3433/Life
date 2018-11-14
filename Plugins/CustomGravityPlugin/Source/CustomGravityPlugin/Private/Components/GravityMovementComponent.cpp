@@ -354,6 +354,14 @@ void UGravityMovementComponent::DoJump(FVector ForwardsDir)
 	CapsuleComponent->GetBodyInstance()->AddImpulse(JumpImpulse, bUseAccl);
 }
 
+void UGravityMovementComponent::AddExternalForce(FVector ExternalForce)
+{
+	if (CapsuleComponent)
+	{
+		CapsuleComponent->GetBodyInstance()->AddImpulse(ExternalForce, false);
+	}
+}
+
 void UGravityMovementComponent::DoSprint()
 {
 	if (bIsInAir || bIsSprinting) { return; }

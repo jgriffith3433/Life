@@ -37,6 +37,7 @@ public:
 	virtual void UpdateCapsuleRotation(float DeltaTime, const FVector& TargetUpVector, float RotationSpeed);
 	virtual void ApplyGravity(const FVector& Force, bool bAllowSubstepping, bool bAccelChange);
 	virtual void DoJump(FVector ForwardsDir);
+	virtual void AddExternalForce(FVector ExternalForce);
 	virtual void DoSprint();
 	virtual void DoStopSprint();
 	virtual void EnableDebuging();
@@ -264,6 +265,8 @@ public:
 
 	FGravityInfo CurrentGravityInfo;
 
+	FOrientationInfo CurrentOrientationInfo;
+
 protected:
 
 	/**The Updated component*/
@@ -274,7 +277,6 @@ protected:
 
 private:
 
-	FOrientationInfo CurrentOrientationInfo;
 
 	float CurrentPlanetDistance;
 

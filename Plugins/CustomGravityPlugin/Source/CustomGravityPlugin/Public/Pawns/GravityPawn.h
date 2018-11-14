@@ -53,6 +53,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddInput"))
 		virtual void AddRightMovement(float ScaleValue = 1.0f);
 
+	/** Called to move Gravity pawn Left and Right */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|GravityPawn|Input", meta = (Keywords = "AddExternalForce"))
+		virtual void AddExternalForce(FVector ExternalForce);
+
 	/**
 	* Add input (affecting Pitch) to the SpringArm relative rotation.
 	* The added value is the product of UpdateRate & ScaleValue.
