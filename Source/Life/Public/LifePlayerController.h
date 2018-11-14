@@ -35,6 +35,8 @@ public:
 	void OnInputMoveForward(float AxisValue);
 	void OnInputMoveRight(float AxisValue);
 
+	void OnQuitPause();
+
 	void PickupCoin(ALifePickup_Coin* Coin);
 	void AddLevelCoin(ALifePickup_Coin* Coin);
 
@@ -47,6 +49,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		bool bCanMove;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		bool bIsPaused;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int TotalCoinsThisLevel;

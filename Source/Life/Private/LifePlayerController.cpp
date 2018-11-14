@@ -25,7 +25,7 @@ void ALifePlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveForward", this, &ALifePlayerController::OnInputMoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ALifePlayerController::OnInputMoveRight);
 
-	//InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AShooterPlayerController::OnToggleInGameMenu);
+	//InputComponent->BindAction("QuitPause", IE_Released, this, &ALifePlayerController::OnQuitPause).bExecuteWhenPaused = true;
 	//InputComponent->BindAction("Scoreboard", IE_Pressed, this, &AShooterPlayerController::OnShowScoreboard);
 	//InputComponent->BindAction("Scoreboard", IE_Released, this, &AShooterPlayerController::OnHideScoreboard);
 	//InputComponent->BindAction("ConditionalCloseScoreboard", IE_Pressed, this, &AShooterPlayerController::OnConditionalCloseScoreboard);
@@ -33,8 +33,16 @@ void ALifePlayerController::SetupInputComponent()
 	
 }
 
+void ALifePlayerController::OnQuitPause()
+{
+	bIsPaused = IsPaused();
+	SetPause(!bIsPaused);
+	bIsPaused = IsPaused();
+}
+
 void ALifePlayerController::Tick(float DeltaTime)
 {
+	bIsPaused = IsPaused();
 	if (!bCanMove && LifeCharacter)
 	{
 		LifeCharacter->StopMovement();

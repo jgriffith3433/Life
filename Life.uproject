@@ -18,6 +18,11 @@
 		{
 			"Name": "CustomGravityPlugin",
 			"Enabled": true
+		},
+		{
+			"Name": "LogitechG",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/168a361cd05943358dff438115c5d1c2"
 		}
 	],
 	"TargetPlatforms": [

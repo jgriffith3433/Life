@@ -6,7 +6,7 @@ public class Life : ModuleRules
 {
 	public Life(ReadOnlyTargetRules Target) : base(Target)
     {
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "LogitechG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
