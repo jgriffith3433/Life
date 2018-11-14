@@ -19,5 +19,9 @@
 			"Name": "CustomGravityPlugin",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"AllDesktop",
+		"WindowsNoEditor"
 	]
 }
