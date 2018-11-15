@@ -1,0 +1,26 @@
+Custom gameplay
+
+No default materials
+
+Keep the file size low
+
+Rename WindowsNoEditor to TeamName_GameName
+
+Submit to Itch and to the GameJam
+
+Declare what you didn't make during the Jam
+
+LightSync
+https://youtu.be/0eF9GEj-Ryo
+
+Game scored on
+1) How fun it is.
+2) It's unique use of theme
+3) It's visual fidelity (design cohesiveness, artistic)
+
+
+Deadline Thursday 11/15 2pm ET
+
+The theme is "Reality is often inaccurate"
+
+

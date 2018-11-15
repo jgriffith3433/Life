@@ -1,0 +1,53 @@
+Used resources
+
+Custom Gravity Project 4.19 by Mhousse1247 (Elhoussine Mehnik)
+https://ue4resources.com/plugins
+- Heavily modified, used as a resource for point phyics.
+
+Necro's Utility Material Pack from Epic marketplace
+http://totaliterritory.com/blog1/index.php/necros-utility-mat-pack
+
+Animation Starter Pack from Epic marketplace (Epic Games)
+
+Eye ball (Ariana3DArt)
+https://www.turbosquid.com/FullPreview/Index.cfm/ID/663849
+
+Advanced Magic FX 13 from Epic marketplace (Kakky)
+https://www.youtube.com/watch?v=t4Ag_qlQG20&feature=youtu.be
+
+Landscape Backgrounds from Epic marketplace
+
+Sound Phenomenon Fantasy from Epic marketplace (level music)
+
+Walking sound
+https://freesound.org/people/editor_adp/sounds/269482/
+
+Coin pickup sound
+https://freesound.org/people/Eponn/sounds/420995/
+
+Jump sound
+Human Vocalizations marketplace by Gamemaster audio
+
+Fell out of world sound
+https://freesound.org/people/JordanDurren/sounds/369692/
+
+Gooba babbling sound
+https://freesound.org/people/dersuperanton/sounds/435876/
+
+Level win sound
+https://freesound.org/people/Tuudurt/sounds/258142/
+
+Level fail sound
+https://freesound.org/people/V4cuum/sounds/348644/
+
+Active teleporter sound
+https://freesound.org/people/Alexmattucci/sounds/403023/
+
+Teleport sound
+https://freesound.org/people/fins/sounds/146729/
+
+Pause sound
+https://freesound.org/people/crisstanza/sounds/167127/
+
+Pixel art coin top right UI (tutorial)
+https://www.tutpad.com/tutorials/motion-graphics-animate-a-pixel-art-coin
